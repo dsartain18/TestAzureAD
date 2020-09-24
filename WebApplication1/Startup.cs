@@ -43,7 +43,8 @@ namespace WebApplication1
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
 
                     };
-                });
+                })
+                .AddMicrosoftIdentityWebApp(Configuration, "AzureAd"); ;
 
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
