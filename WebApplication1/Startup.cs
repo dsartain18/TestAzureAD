@@ -48,6 +48,8 @@ namespace WebApplication1
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
 
+            services.AddApplicationInsightsTelemetry();
+
             services.AddRazorPages();
 
             services.AddOptions();
