@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +32,7 @@ namespace WebApplication1
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)                
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters()
@@ -44,7 +46,7 @@ namespace WebApplication1
 
                     };
                 })
-                .AddMicrosoftIdentityWebApp(Configuration, "AzureAd"); ;
+                .AddMicrosoftIdentityWebApp(Configuration, "AzureAd");
 
             services.AddControllersWithViews()
                 .AddMicrosoftIdentityUI();
@@ -55,7 +57,39 @@ namespace WebApplication1
 
             services.AddOptions();
 
-           // services.Configure<OpenIdConnectOptions>(Configuration.GetSection("AzureAdB2C"));
+            services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+            {
+                options.Events = new OpenIdConnectEvents
+                {
+                    OnTokenValidated = ctx =>
+                    {
+                        // claimsIdentity we want to add our roles to...
+                        //ClaimsIdentity claimsIdentity = ClaimsPrincipal.Current.Identity as ClaimsIdentity;
+
+                        //// List of claims
+                        //var appRoles = new System.Collections.Generic.List<Claim>();
+
+                        //foreach (Claim claim in ClaimsPrincipal.Current.FindAll("groups"))
+                        //{
+                        //    // use the OID and get a friendly name to use as the role (if it exists)
+                        //    var groupStringValue = Configuration[$"AcceptedRoles:{claim.Value}"];
+                        //    if (groupStringValue != null)
+                        //    {
+                        //        // build the list
+                        //        appRoles.Add(new Claim(claimsIdentity.RoleClaimType, groupStringValue));
+                        //    }
+                        //}
+
+                        //if (appRoles.Count > 0)
+                        //{
+                        //    // if anything in the list, add these claims to the current identity
+                        //    claimsIdentity.AddClaims(appRoles);
+                        //}
+
+                        return Task.CompletedTask;
+                    },
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

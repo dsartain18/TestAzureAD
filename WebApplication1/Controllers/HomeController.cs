@@ -11,9 +11,9 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
-#if !Debug
+
     [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
-#endif
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -25,6 +25,8 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
+            _logger.LogInformation(HttpContext.User.Identity.Name);
+
             return View();
         }
 
