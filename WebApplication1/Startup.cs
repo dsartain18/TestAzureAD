@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Graph;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Microsoft.IdentityModel.Tokens;
@@ -63,28 +65,27 @@ namespace WebApplication1
                 {
                     OnTokenValidated = ctx =>
                     {
-                        // claimsIdentity we want to add our roles to...
-                        //ClaimsIdentity claimsIdentity = ClaimsPrincipal.Current.Identity as ClaimsIdentity;
+                        ClaimsPrincipal user = ctx.Principal;
 
-                        //// List of claims
-                        //var appRoles = new System.Collections.Generic.List<Claim>();
+                        // List of claims
+                        var appRoles = new System.Collections.Generic.List<Claim>();
 
-                        //foreach (Claim claim in ClaimsPrincipal.Current.FindAll("groups"))
-                        //{
-                        //    // use the OID and get a friendly name to use as the role (if it exists)
-                        //    var groupStringValue = Configuration[$"AcceptedRoles:{claim.Value}"];
-                        //    if (groupStringValue != null)
-                        //    {
-                        //        // build the list
-                        //        appRoles.Add(new Claim(claimsIdentity.RoleClaimType, groupStringValue));
-                        //    }
-                        //}
+                        foreach (Claim claim in user.FindAll("groups"))
+                        {
+                            // use the OID and get a friendly name to use as the role (if it exists)
+                            var groupStringValue = Configuration[$"AcceptedRoles:ReportArchivalUser"];
+                            if (groupStringValue != null && groupStringValue == claim.Value)
+                            {
+                                // build the list
+                                appRoles.Add(new Claim(ClaimTypes.Role, "ReportArchivalUser"));
+                            }
+                        }
 
-                        //if (appRoles.Count > 0)
-                        //{
-                        //    // if anything in the list, add these claims to the current identity
-                        //    claimsIdentity.AddClaims(appRoles);
-                        //}
+                        if (appRoles.Count > 0)
+                        {
+                            // if anything in the list, add these claims to the current identity
+                            user.AddIdentity(new ClaimsIdentity(appRoles));
+                        }
 
                         return Task.CompletedTask;
                     },

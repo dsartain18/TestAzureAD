@@ -12,7 +12,7 @@ using WebApplication1.Models;
 namespace WebApplication1.Controllers
 {
 
-    [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme, Roles = "ReportArchivalUser")]
 
     public class HomeController : Controller
     {
